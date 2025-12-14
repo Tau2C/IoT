@@ -1,0 +1,53 @@
+name: AI Docs Updater
+
+on:
+  push:
+    branches:
+      - master
+      - development
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Fetches the last 2 commits.
+
+      - name: Get latest commit information
+        id: commit_info
+        run: |
+          echo 'commit_message<<EOF' >> "$GITHUB_OUTPUT"
+          echo "$(git log -1 --pretty=%B)" >> "$GITHUB_OUTPUT"
+          echo 'EOF' >> "$GITHUB_OUTPUT"
+
+          echo 'commit_diff<<EOF' >> "$GITHUB_OUTPUT"
+          echo "$(git diff HEAD~1 HEAD)" >> "$GITHUB_OUTPUT"
+          echo 'EOF' >> "$GITHUB_OUTPUT"
+
+      - name: Run AI Documentation Agent
+        if: "!contains(steps.commit_info.outputs.commit_message, '[DEVDOCS]')"
+        # This step will be implemented later.
+        # It will call an AI model (e.g., via an API) with the commit info.
+        # The AI will then propose changes to the /docs folder based on the rules
+        # in /docs/README.md.
+        run: |
+          echo "AI processing step is a placeholder."
+          echo "Commit Message: ${{ steps.commit_info.outputs.commit_message }}"
+          # In a real implementation, the diff would be passed to the AI.
+          # Be cautious with large diffs to not exceed context windows.
+          echo "Diff is available but not printed here for brevity."
+
+      - name: Commit documentation changes
+        if: "!contains(steps.commit_info.outputs.commit_message, '[DEVDOCS]')"
+        # This step will be implemented later.
+        # It will take the output from the AI step and commit it to the repository.
+        run: |
+          echo "Committing changes step is a placeholder."
+          # Example of what this step might do:
+          # git config --global user.name 'AI Doc Bot'
+          # git config --global user.email 'ai-doc-bot@example.com'
+          # git add docs/
+          # git commit -m "[AI-DOCS] Automatic documentation update" || echo "No changes to commit"
+          # git push
